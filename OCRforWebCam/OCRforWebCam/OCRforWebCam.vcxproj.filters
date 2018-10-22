@@ -18,5 +18,11 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="label.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="knn.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
