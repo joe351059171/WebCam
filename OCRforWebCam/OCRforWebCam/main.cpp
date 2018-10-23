@@ -147,7 +147,6 @@ int main(int argc, char** argv)
 		label_num = cv::connectedComponentsWithStats(imgThres, labels, stats, centroids);
 		//cv::normalize(labels, seeLabels, 0, 255, cv::NORM_MINMAX, CV_8U);
 
-
 		for (int i = 0; i < label_num; i++) {
 			int width = stats.at<int>(i, cv::CC_STAT_WIDTH);
 			int height = stats.at<int>(i, cv::CC_STAT_HEIGHT);
@@ -163,11 +162,10 @@ int main(int argc, char** argv)
 					cv::rectangle(img, dect, cv::Scalar(0, 255, 0), 1);
 					cv::Mat retImg = img(dect);
 					char file[256];
-					//sprintf_s(file, "%d-%d.jpg", frame_count, i);
-					//string str = file;
-					sprintf_s(file, "%d.jpg", i);
-					imwrite(file, retImg);
-					//imgprocess(str);
+					sprintf_s(file, "%d-%d.jpg", frame_count, i);
+					string str = file;
+					//imwrite(file, retImg);
+					imgprocess(str);
 				}
 			}
 		}
