@@ -12,7 +12,7 @@ using namespace std;
 int main(int argc, char** argv)
 {
 	int label_num = 0;
-	Mat resource = imread("test.png", 1);
+	Mat resource = imread(argv[1], 1);
 	imshow("origin", resource);
 	cvtColor(resource, resource, CV_RGB2GRAY);
 	imshow("src", resource);
