@@ -1,9 +1,10 @@
 
 #include "opencv2/opencv.hpp"
 #include<opencv2/ml/ml.hpp>
-#include<highgui.h>
-#include<opencv2/imgproc.hpp>
+#include<opencv2/imgproc/imgproc.hpp>
 #include<opencv2/videoio.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 
 using namespace cv;
@@ -12,8 +13,10 @@ using namespace std;
 int main(int argc, char** argv)
 {
 	int label_num = 0;
-	Mat resource = imread(argv[1], 1);
-	imshow("origin", resource);
+	Mat src = imread(argv[1], 0);
+	Mat resource;
+	resize(src, resource, Size(), 5, 5, INTER_CUBIC);
+	/*imshow("origin", resource);
 	cvtColor(resource, resource, CV_RGB2GRAY);
 	imshow("src", resource);
 	Mat thre;
@@ -35,7 +38,17 @@ int main(int argc, char** argv)
 			CV_Assert(0 <= label && label <= label_num);
 			img_color.at<cv::Vec3b>(y, x) = colors[label];
 		}
-	cv::imshow("Labeled map", img_color);
+	cv::imshow("Labeled map", img_color);*/
+	vector< vector<Point> > contours;
+	vector<Vec4i> hierarchy;
+	Mat gray;
+	threshold(resource, gray, 100, 255,0);
+	imshow("grayscale", gray);
+	findContours(gray, contours, hierarchy, 1,CV_CHAIN_APPROX_NONE);
+	Mat imageContours = Mat::zeros(resource.size(), CV_8UC1);
+	drawContours(imageContours,contours,-1,Scalar::all(255));
+	imshow("src", resource);
+	imshow("contours", imageContours);
 	waitKey();
 	return 0;
 }
