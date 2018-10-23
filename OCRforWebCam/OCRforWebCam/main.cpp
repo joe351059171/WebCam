@@ -87,7 +87,8 @@ void imgprocess(string filename) {
 		resize(ROI, tmp1, Size(10, 10), 0, 0, INTER_LINEAR);
 		tmp1.convertTo(tmp2, CV_32FC1);
 		Mat response;
-		float p = knn->findNearest(tmp2.reshape(1, 1), 1, response);
+		float p = knn->findNearest(tmp2.reshape(1, 1), 1, response);//If only a single input vector is passed, 
+												//all output matrices are optional and the predicted value is returned by the method.
 		char name[4];
 		sprintf_s(name, "%d", (int)p);
 		putText(dst, name, Point(r.x, r.y + r.height), 0, 1, Scalar(0, 255, 0), 1, 8);
