@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 	Mat gray;
 	threshold(resource, gray, 100, 255,0);
 	imshow("grayscale", gray);
-	findContours(gray, contours, hierarchy, 1,CV_CHAIN_APPROX_NONE);
+	findContours(gray, contours, hierarchy, 2,CV_CHAIN_APPROX_SIMPLE);
 	Mat imageContours = Mat::zeros(resource.size(), CV_8UC1);
 	drawContours(imageContours,contours,-1,Scalar::all(255));
 	imshow("src", resource);
