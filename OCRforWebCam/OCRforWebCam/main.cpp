@@ -153,7 +153,7 @@ int main(int argc, char** argv)
 			int area = stats.at<int>(i, cv::CC_STAT_AREA);
 			if (area > 1000 && area < 3000) {
 				double iou = area / (double)(width*height);
-				cout << "IOU" << iou << endl;//交并比
+				//cout << "IOU" << iou << endl;//交并比
 				double wh = width / (double)(height);
 				//cout << "W/H" << wh << endl;
 				if (iou > 0.5 && wh < 0.5) {
