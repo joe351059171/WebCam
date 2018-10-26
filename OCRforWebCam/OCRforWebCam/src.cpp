@@ -1,22 +1,23 @@
 
-#include "opencv2/opencv.hpp"
-#include<opencv2/ml/ml.hpp>
-#include<opencv2/imgproc/imgproc.hpp>
-#include<opencv2/videoio.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
+//#include "opencv2/opencv.hpp"
+//#include<opencv2/ml/ml.hpp>
+//#include<opencv2/imgproc/imgproc.hpp>
+//#include<opencv2/videoio.hpp>
+//#include <opencv2/core/core.hpp>
+//#include <opencv2/highgui/highgui.hpp>
+#include <rapp/rapp.h>
 
 
-using namespace cv;
-using namespace std;
+//using namespace cv;
+//using namespace std;
 
 int main(int argc, char** argv)
 {
-	int label_num = 0;
+	/*int label_num = 0;
 	Mat src = imread(argv[1], 0);
 	Mat resource;
 	resize(src, resource, Size(), 5, 5, INTER_CUBIC);
-	/*imshow("origin", resource);
+	imshow("origin", resource);
 	cvtColor(resource, resource, CV_RGB2GRAY);
 	imshow("src", resource);
 	Mat thre;
@@ -38,7 +39,7 @@ int main(int argc, char** argv)
 			CV_Assert(0 <= label && label <= label_num);
 			img_color.at<cv::Vec3b>(y, x) = colors[label];
 		}
-	cv::imshow("Labeled map", img_color);*/
+	cv::imshow("Labeled map", img_color);
 	vector< vector<Point> > contours;
 	vector<Vec4i> hierarchy;
 	Mat gray;
@@ -50,5 +51,10 @@ int main(int argc, char** argv)
 	imshow("src", resource);
 	imshow("contours", imageContours);
 	waitKey();
-	return 0;
+	return 0;*/
+	rapp_initialize();
+	int width = 512, height = 480;
+
+
+	rapp_terminate();
 }
