@@ -27,12 +27,10 @@ int main(int argc, char** argv)
 
 	FILE *file = fopen("filelist.txt", "r");
 	char name[200];
-	while (fscanf_s(file, "%s\n", &name) != EOF) {
+	while (fscanf(file, "%s\n", &name) != EOF) {
 		imgproc(name);
-		
 	}
-	
-
+	fclose(file);
 	return 0;
 	
 }
@@ -70,10 +68,11 @@ void FileScan(const char * dir)
 
 void imgproc(const char* filename) {
 	//Process image to extract contour
-	Mat thr, gray, con;
-	Mat src = imread(filename, 1);
+	Mat thr, gray, con,src;
+	Mat file = imread(filename, 1);
+	resize(file, src,Size(),3,3, INTER_CUBIC);
 	cvtColor(src, gray, CV_BGR2GRAY);
-	threshold(gray, thr, 200, 255, THRESH_BINARY_INV); //Threshold to find contour
+	threshold(gray, thr, 100, 255, THRESH_BINARY_INV); //Threshold to find contour
 	thr.copyTo(con);
 
 	// Create sample and label data
