@@ -13,7 +13,8 @@
 using namespace cv;
 using namespace std;
 
-void  listFiles(const char*);
+void FileScan(const char*);
+void imgproc(const char*);
 
 int main(int argc, char** argv)
 {
@@ -22,13 +23,21 @@ int main(int argc, char** argv)
 	cin.getline(dir, 200);
 
 	strcat_s(dir, "*.jpg");        // 在要遍历的目录后加上通配符
-	listFiles(dir);
+	FileScan(dir);
+
+	FILE *file = fopen("filelist.txt", "r");
+	char name[200];
+	while (fscanf_s(file, "%s\n", &name) != EOF) {
+		imgproc(name);
+		
+	}
+	
 
 	return 0;
 	
 }
 
-void listFiles(const char * dir)
+void FileScan(const char * dir)
 {
 	intptr_t handle;
 	_finddata_t findData;
@@ -47,17 +56,22 @@ void listFiles(const char * dir)
 			&& strcmp(findData.name, "..") == 0
 			)    // 是否是子目录并且不为"."或".."
 			cout << findData.name << "\t<dir>\n";
-		else
+		else {
 			cout << findData.name << "\t" << findData.size << endl;
+			FILE *input = fopen("filelist.txt", "a+");
+			fprintf(input, "%s\n", findData.name);
+			fclose(input);
+		}
 	} while (_findnext(handle, &findData) == 0);    // 查找目录中的下一个文件
 
 	cout << "Done!\n";
 	_findclose(handle);    // 关闭搜索句柄
 }
-/*{
+
+void imgproc(const char* filename) {
 	//Process image to extract contour
 	Mat thr, gray, con;
-	Mat src = imread(argv[1], 1);
+	Mat src = imread(filename, 1);
 	cvtColor(src, gray, CV_BGR2GRAY);
 	threshold(gray, thr, 200, 255, THRESH_BINARY_INV); //Threshold to find contour
 	thr.copyTo(con);
@@ -90,17 +104,15 @@ void listFiles(const char * dir)
 	tmp = response_array.reshape(1, 1); //make continuous
 	tmp.convertTo(response, CV_32FC1); // Convert  to float
 
-	FileStorage Data("TrainingData.yml", FileStorage::WRITE); // Store the sample data in a file
+	FileStorage Data("TrainingData.yml", FileStorage::APPEND); // Store the sample data in a file
 	Data << "data" << sample;
 	Data.release();
 
-	FileStorage Label("LabelData.yml", FileStorage::WRITE); // Store the label data in a file
+	FileStorage Label("LabelData.yml", FileStorage::APPEND); // Store the label data in a file
 	Label << "label" << response;
 	Label.release();
 	cout << "Training and Label data created successfully....!! " << endl;
 
 	imshow("src", src);
 	waitKey(0);
-
-	return 0;
-}*/
+}
