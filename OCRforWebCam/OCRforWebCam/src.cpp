@@ -19,16 +19,19 @@ void imgproc(const char*,int);
 int main(int argc, char** argv)
 {
 	char dir[200];
+	int the = 0;
 	cout << "Enter a directory (ends with \'\\\'): ";
 	cin.getline(dir, 200);
-	int thresh = scanf("%s", argv[1]);
 	strcat_s(dir, "*.jpg");        // 在要遍历的目录后加上通配符
 	FileScan(dir);
 
+	printf("threshold:\t");
+	scanf("%d", &the);
+	
 	FILE *file = fopen("filelist.txt", "r");
 	char name[200];
 	while (fscanf(file, "%s\n", &name) != EOF) {
-		imgproc(name,thresh);
+		imgproc(name,the);
 	}
 	fclose(file);
 	return 0;
@@ -84,18 +87,18 @@ void imgproc(const char* filename,int thresh) {
 
 	for (int i = 0; i < contours.size(); i = hierarchy[i][0]) // iterate through first hierarchy level contours
 	{
-		Rect r = boundingRect(contours[i]); //Find bounding rect for each contour
-		rectangle(src, Point(r.x, r.y), Point(r.x + r.width, r.y + r.height), Scalar(0, 0, 255), 2, 8, 0);
-		Mat ROI = thr(r); //Crop the image
-		Mat tmp1, tmp2;
-		resize(ROI, tmp1, Size(10, 10), 0, 0, INTER_LINEAR); //resize to 10X10
-		tmp1.convertTo(tmp2, CV_32FC1); //convert to float
-		sample.push_back(tmp2.reshape(1, 1)); // Store  sample data
-		imshow("src", src);
-		int c = waitKey(0); // Read corresponding label for contour from keyoard
-		c -= 0x30;     // Convert ascii to intiger value
-		response_array.push_back(c); // Store label to a mat
-		rectangle(src, Point(r.x, r.y), Point(r.x + r.width, r.y + r.height), Scalar(0, 255, 0), 2, 8, 0);
+			Rect r = boundingRect(contours[i]); //Find bounding rect for each contour
+			rectangle(src, Point(r.x, r.y), Point(r.x + r.width, r.y + r.height), Scalar(0, 0, 255), 2, 8, 0);
+			Mat ROI = thr(r); //Crop the image
+			Mat tmp1, tmp2;
+			resize(ROI, tmp1, Size(10, 10), 0, 0, INTER_LINEAR); //resize to 10X10
+			tmp1.convertTo(tmp2, CV_32FC1); //convert to float
+			sample.push_back(tmp2.reshape(1, 1)); // Store  sample data
+			imshow("src", src);
+			int c = waitKey(0); // Read corresponding label for contour from keyoard
+			c -= 0x30;     // Convert ascii to intiger value
+			response_array.push_back(c); // Store label to a mat
+			rectangle(src, Point(r.x, r.y), Point(r.x + r.width, r.y + r.height), Scalar(0, 255, 0), 2, 8, 0);
 	}
 
 	// Store the data to file
