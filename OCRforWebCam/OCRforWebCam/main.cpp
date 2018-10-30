@@ -151,22 +151,22 @@ int main(int argc, char** argv)
 		for (int i = 0; i < label_num; i++) {
 			int width = stats.at<int>(i, cv::CC_STAT_WIDTH);
 			int height = stats.at<int>(i, cv::CC_STAT_HEIGHT);
-			int area = stats.at<int>(i, cv::CC_STAT_AREA);
+			int area = width * height;//stats.at<int>(i, cv::CC_STAT_AREA);
 			if (area > 1000 && area < 3000) {
 				double iou = area / (double)(width*height);
 				//cout << "IOU" << iou << endl;//½»²¢±È
 				double wh = width / (double)(height);
 				//cout << "W/H" << wh << endl;
-				if (iou > 0.5 && wh < 0.5) {
+				if (wh < 0.5&& wh> 0.3) {
 					//	cout << "(" << stats.at<int>(i, cv::CC_STAT_LEFT) << " x " << stats.at<int>(i, cv::CC_STAT_TOP) << ")(" << width << " x " << height << ")" << endl;
-					cv::Rect dect(stats.at<int>(i, cv::CC_STAT_LEFT), stats.at<int>(i, cv::CC_STAT_TOP), width, height);
+					cv::Rect dect(stats.at<int>(i, cv::CC_STAT_LEFT)-10, stats.at<int>(i, cv::CC_STAT_TOP)-10, width+10, height+10);
 					cv::rectangle(img, dect, cv::Scalar(0, 255, 0), 1);
 					cv::Mat retImg = img(dect);
 					char file[256];
 					sprintf_s(file, "%d-%d.jpg", frame_count, i);
 					string str = file;
 					imwrite(file, retImg);
-					imgprocess(str);
+				//	imgprocess(str);
 				}
 			}
 		}
@@ -179,7 +179,7 @@ int main(int argc, char** argv)
 
 		//if (cv::waitKey(40) >= 0)
 			//break;
-		cv::waitKey(0);
+		cv::waitKey(40);
 	}
 	if (cap.isOpened()) {
 		cap.release();
