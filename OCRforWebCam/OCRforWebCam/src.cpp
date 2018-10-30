@@ -21,14 +21,14 @@ int main(int argc, char** argv)
 	char dir[200];
 	cout << "Enter a directory (ends with \'\\\'): ";
 	cin.getline(dir, 200);
-
+	int thresh = scanf("%s", argv[1]);
 	strcat_s(dir, "*.jpg");        // 在要遍历的目录后加上通配符
 	FileScan(dir);
 
 	FILE *file = fopen("filelist.txt", "r");
 	char name[200];
 	while (fscanf(file, "%s\n", &name) != EOF) {
-		imgproc(name);
+		imgproc(name,thresh);
 	}
 	fclose(file);
 	return 0;
@@ -66,13 +66,13 @@ void FileScan(const char * dir)
 	_findclose(handle);    // 关闭搜索句柄
 }
 
-void imgproc(const char* filename) {
+void imgproc(const char* filename,int thresh) {
 	//Process image to extract contour
 	Mat thr, gray, con;
 	Mat src = imread(filename, 1);
 //	resize(file, src,Size(),3,3, INTER_CUBIC);
 	cvtColor(src, gray, CV_BGR2GRAY);
-	threshold(gray, thr, 100, 255, THRESH_BINARY_INV); //Threshold to find contour
+	threshold(gray, thr, thresh, 255, THRESH_BINARY_INV); //Threshold to find contour
 	thr.copyTo(con);
 
 	// Create sample and label data
