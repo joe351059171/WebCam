@@ -143,6 +143,7 @@ int main(int argc, char** argv)
 		cv::cvtColor(img, gray, CV_BGR2GRAY);
 		//gray = gray(myROI);
 		cv::threshold(gray, imgThres, threshold, 255, CV_THRESH_BINARY);
+		imshow("imgthr", imgThres);
 		//cv::adaptiveThreshold(gray, imgThres, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, 125, 5);
 		//label_num = cv::connectedComponents(imgThres, labels);
 		label_num = cv::connectedComponentsWithStats(imgThres, labels, stats, centroids);
@@ -152,14 +153,14 @@ int main(int argc, char** argv)
 			int width = stats.at<int>(i, cv::CC_STAT_WIDTH);
 			int height = stats.at<int>(i, cv::CC_STAT_HEIGHT);
 			int area = width * height;//stats.at<int>(i, cv::CC_STAT_AREA);
-			if (area > 1000 && area < 3000) {
+			if (area > 1000 && area < 5000) {
 				double iou = area / (double)(width*height);
 				//cout << "IOU" << iou << endl;//½»²¢±È
 				double wh = width / (double)(height);
 				//cout << "W/H" << wh << endl;
-				if (wh < 0.5&& wh> 0.3) {
+				if (wh < 0.6&& wh> 0.3) {
 					//	cout << "(" << stats.at<int>(i, cv::CC_STAT_LEFT) << " x " << stats.at<int>(i, cv::CC_STAT_TOP) << ")(" << width << " x " << height << ")" << endl;
-					cv::Rect dect(stats.at<int>(i, cv::CC_STAT_LEFT)-10, stats.at<int>(i, cv::CC_STAT_TOP)-10, width+10, height+10);
+					cv::Rect dect(stats.at<int>(i, cv::CC_STAT_LEFT), stats.at<int>(i, cv::CC_STAT_TOP), width, height);
 					cv::rectangle(img, dect, cv::Scalar(0, 255, 0), 1);
 					cv::Mat retImg = img(dect);
 					char file[256];
@@ -179,7 +180,7 @@ int main(int argc, char** argv)
 
 		//if (cv::waitKey(40) >= 0)
 			//break;
-		cv::waitKey(40);
+		cv::waitKey(0);
 	}
 	if (cap.isOpened()) {
 		cap.release();
