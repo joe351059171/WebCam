@@ -14,7 +14,7 @@ using namespace cv;
 using namespace std;
 
 void FileScan(const char*);
-void imgproc(const char*);
+void imgproc(const char*,int);
 
 int main(int argc, char** argv)
 {
