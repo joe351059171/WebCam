@@ -143,7 +143,6 @@ int main(int argc, char** argv)
 		cv::cvtColor(img, gray, CV_BGR2GRAY);
 		//gray = gray(myROI);
 		cv::threshold(gray, imgThres, threshold, 255, CV_THRESH_BINARY);
-		imshow("imgthr", imgThres);
 		//cv::adaptiveThreshold(gray, imgThres, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, 125, 5);
 		//label_num = cv::connectedComponents(imgThres, labels);
 		label_num = cv::connectedComponentsWithStats(imgThres, labels, stats, centroids);
