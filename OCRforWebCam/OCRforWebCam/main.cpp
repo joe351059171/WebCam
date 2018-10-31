@@ -113,17 +113,17 @@ int main(int argc, char** argv)
 	cv::VideoCapture cap;
 	cv::VideoWriter cvw;
 	cv::Rect myROI(10, 500, 300, 580);
-	int area_gt, area_lt, wh_gt, wh_lt;
+	int area_max, area_min, wh_max, wh_min;
 	if (argc > 6) {
 		myROI.x = atol(argv[2]);
 		myROI.y = atol(argv[3]);
 		myROI.width = atol(argv[4]);
 		myROI.height = atol(argv[5]);
 		threshold = atol(argv[6]);
-		area_gt = atol(argv[7]);
-		area_lt = atol(argv[8]);
-		wh_gt = atol(argv[9]);
-		wh_lt = atol(argv[10]);
+		area_max = atol(argv[7]);
+		area_min = atol(argv[8]);
+		wh_max = atol(argv[9]);
+		wh_min = atol(argv[10]);
 	}
 	//cvw.open("test.mp4", CV_FOURCC('M', 'J', 'P', 'G'), 25, cv::Size(300, 580));
 	if (!cap.open(argv[1])) {
@@ -157,12 +157,12 @@ int main(int argc, char** argv)
 			int width = stats.at<int>(i, cv::CC_STAT_WIDTH);
 			int height = stats.at<int>(i, cv::CC_STAT_HEIGHT);
 			int area = width * height;//stats.at<int>(i, cv::CC_STAT_AREA);
-			if (area > 1000 && area < 5000) {
+			if (area > area_min && area < area_max) {
 				double iou = area / (double)(width*height);
 				//cout << "IOU" << iou << endl;//½»²¢±È
 				double wh = width / (double)(height);
 				//cout << "W/H" << wh << endl;
-				if (wh_lt < 0.6&& wh_gt> 0.3) {
+				if (wh < wh_max&& wh> wh_min) {
 					//	cout << "(" << stats.at<int>(i, cv::CC_STAT_LEFT) << " x " << stats.at<int>(i, cv::CC_STAT_TOP) << ")(" << width << " x " << height << ")" << endl;
 					cv::Rect dect(stats.at<int>(i, cv::CC_STAT_LEFT), stats.at<int>(i, cv::CC_STAT_TOP), width, height);
 					cv::rectangle(img, dect, cv::Scalar(0, 255, 0), 1);
