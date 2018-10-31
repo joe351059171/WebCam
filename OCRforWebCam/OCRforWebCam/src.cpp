@@ -87,6 +87,7 @@ void imgproc(const char* filename,int thresh) {
 
 	for (int i = 0; i < contours.size(); i = hierarchy[i][0]) // iterate through first hierarchy level contours
 	{
+		if (contours.at(i).size() <= 40) {
 			Rect r = boundingRect(contours[i]); //Find bounding rect for each contour
 			rectangle(src, Point(r.x, r.y), Point(r.x + r.width, r.y + r.height), Scalar(0, 0, 255), 2, 8, 0);
 			Mat ROI = thr(r); //Crop the image
@@ -99,6 +100,7 @@ void imgproc(const char* filename,int thresh) {
 			c -= 0x30;     // Convert ascii to intiger value
 			response_array.push_back(c); // Store label to a mat
 			rectangle(src, Point(r.x, r.y), Point(r.x + r.width, r.y + r.height), Scalar(0, 255, 0), 2, 8, 0);
+		}
 	}
 
 	// Store the data to file
