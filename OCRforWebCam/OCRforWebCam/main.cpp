@@ -113,7 +113,7 @@ int main(int argc, char** argv)
 	cv::VideoCapture cap;
 	cv::VideoWriter cvw;
 	cv::Rect myROI(10, 500, 300, 580);
-	int area_max = 5000, area_min = 3000;
+	int area_max = 3000, area_min = 1000;
 	double wh_max = 0.6, wh_min = 0.3;
 	if (argc > 6) {
 		myROI.x = atol(argv[2]);
@@ -185,7 +185,7 @@ int main(int argc, char** argv)
 
 		//if (cv::waitKey(40) >= 0)
 			//break;
-		cv::waitKey(0);
+		cv::waitKey(40);
 	}
 	if (cap.isOpened()) {
 		cap.release();
