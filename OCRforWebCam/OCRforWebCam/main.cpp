@@ -104,7 +104,7 @@ void imgprocess(string filename) {
 int main(int argc, char** argv)
 {
 	if (argc == 1) {
-		std::cout << "DriveLabel.exe videostream [left top width height threshold]" << std::endl;
+		std::cout << "DriveLabel.exe videostream [left top width height threshold area_max area_min w/h_max w/h_min ]" << std::endl;
 		std::cout << "For example: DriveLabel.exe d:\\sth.mp4" << std::endl;
 	}
 	cv::Mat img, gray, imgThres, labels, seeLabels, stats, centroids;
