@@ -113,7 +113,8 @@ int main(int argc, char** argv)
 	cv::VideoCapture cap;
 	cv::VideoWriter cvw;
 	cv::Rect myROI(10, 500, 300, 580);
-	int area_max, area_min, wh_max, wh_min;
+	int area_max = 5000, area_min = 3000;
+	double wh_max = 0.6, wh_min = 0.3;
 	if (argc > 6) {
 		myROI.x = atol(argv[2]);
 		myROI.y = atol(argv[3]);
@@ -165,7 +166,7 @@ int main(int argc, char** argv)
 				if (wh < wh_max&& wh> wh_min) {
 					//	cout << "(" << stats.at<int>(i, cv::CC_STAT_LEFT) << " x " << stats.at<int>(i, cv::CC_STAT_TOP) << ")(" << width << " x " << height << ")" << endl;
 					cv::Rect dect(stats.at<int>(i, cv::CC_STAT_LEFT), stats.at<int>(i, cv::CC_STAT_TOP), width, height);
-					cv::rectangle(img, dect, cv::Scalar(0, 255, 0), 1);
+					cv::rectangle(img, dect, cv::Scalar(0, 255, 0), 3);
 					cv::Mat retImg = img(dect);
 					char file[256];
 					sprintf_s(file, "%d-%d.jpg", frame_count, i);
