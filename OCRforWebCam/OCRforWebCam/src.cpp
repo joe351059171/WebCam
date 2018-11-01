@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 
 #include "opencv2/opencv.hpp"
 #include<opencv2/ml/ml.hpp>
@@ -22,7 +23,7 @@ int main(int argc, char** argv)
 	int the = 0;
 	cout << "Enter a directory (ends with \'\\\'): ";
 	cin.getline(dir, 200);
-	strcat_s(dir, "*.png");        // 在要遍历的目录后加上通配符
+	strcat_s(dir, "*.jpg");        // 在要遍历的目录后加上通配符
 	FileScan(dir);
 
 	printf("threshold:\t");
