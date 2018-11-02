@@ -14,17 +14,19 @@
 using namespace cv;
 using namespace std;
 
-void FileScan(const char*);
+void FileScan(const char*,const char*);
 void imgproc(const char*,int);
 
 int main(int argc, char** argv)
 {
 	char dir[200];
+	char dirwithformat[200];
 	int the = 0;
 	cout << "Enter a directory (ends with \'\\\'): ";
 	cin.getline(dir, 200);
-	strcat_s(dir, "*.jpg");        // 在要遍历的目录后加上通配符
-	FileScan(dir);
+	strcpy(dirwithformat, dir);
+	strcat_s(dirwithformat, "*.jpg");
+	FileScan(dirwithformat,dir);
 
 	printf("threshold:\t");
 	scanf("%d", &the);
@@ -39,12 +41,12 @@ int main(int argc, char** argv)
 	
 }
 
-void FileScan(const char * dir)
+void FileScan(const char * dirwithformat,const char* dir)
 {
 	intptr_t handle;
 	_finddata_t findData;
 
-	handle = _findfirst(dir, &findData);    // 查找目录中的第一个文件
+	handle = _findfirst(dirwithformat, &findData);    // 查找目录中的第一个文件
 	if (handle == -1)
 	{
 		cout << "Failed to find first file!\n";
@@ -61,7 +63,7 @@ void FileScan(const char * dir)
 		else {
 			cout << findData.name << "\t" << findData.size << endl;
 			FILE *input = fopen("filelist.txt", "a+");
-			fprintf(input, "%s\n", findData.name);
+			fprintf(input, "%s%s\n",dir,findData.name);
 			fclose(input);
 		}
 	} while (_findnext(handle, &findData) == 0);    // 查找目录中的下一个文件
@@ -74,7 +76,7 @@ void imgproc(const char* filename,int thresh) {
 	//Process image to extract contour
 	Mat thr, gray, con;
 	Mat src = imread(filename, 1);
-//	resize(file, src,Size(),3,3, INTER_CUBIC);
+	//resize(file, src,Size(),3,3, INTER_CUBIC);
 	cvtColor(src, gray, CV_BGR2GRAY);
 	threshold(gray, thr, thresh, 255, THRESH_BINARY_INV); //Threshold to find contour
 	thr.copyTo(con);
@@ -89,8 +91,8 @@ void imgproc(const char* filename,int thresh) {
 	for (int i = 0; i < contours.size(); i = hierarchy[i][0]) // iterate through first hierarchy level contours
 	{
 			Rect r = boundingRect(contours[i]); //Find bounding rect for each contour
-			if (r.area()< 230||r.area()>800)
-				continue;
+		//	if (r.area()< 230||r.area()>800)
+		//		continue;
 			rectangle(src, Point(r.x, r.y), Point(r.x + r.width, r.y + r.height), Scalar(0, 0, 255), 2, 8, 0);
 			Mat ROI = thr(r); //Crop the image
 			Mat tmp1, tmp2;
