@@ -19,21 +19,19 @@ void imgproc(const char*,int);
 
 int main(int argc, char** argv)
 {
-	char dir[200];
+	char dir[200] = { 0,0,0,0, };
+	strcat(dir, argv[1]);
+//	printf("%s\n",argv[1]);
 	char dirwithformat[200];
-	int the = 0;
-	cout << "Enter a directory (ends with \'\\\'): ";
-	cin.getline(dir, 200);
+	int the = atoi(argv[2]);
+	//cin.getline(dir, 200);
 	strcpy(dirwithformat, dir);
 	strcat_s(dirwithformat, "*.jpg");
 	FileScan(dirwithformat,dir);
-
-	printf("threshold:\t");
-	scanf("%d", &the);
 	
 	FILE *file = fopen("filelist.txt", "r");
 	char name[200];
-	while (fscanf(file, "%s\n", &name) != EOF) {
+	while (fscanf(file, "%[^\n]%*c", &name) != EOF) {
 		imgproc(name,the);
 	}
 	fclose(file);
