@@ -109,7 +109,7 @@ int main(int argc, char** argv)
 	}
 	cv::Mat img, gray, imgThres, labels, seeLabels, stats, centroids;
 	int frame_count = 0, frame_cur = 0, label_num;
-	int threshold = 100;
+	int threshold = 150;
 	cv::VideoCapture cap;
 	cv::VideoWriter cvw;
 	cv::Rect myROI(10, 500, 300, 580);
