@@ -73,10 +73,10 @@ void FileScan(const char * dirwithformat,const char* dir)
 
 void imgproc(const char* filename,int thresh) {
 	//Process image to extract contour
-	Mat thr, gray, con,src;
-	Mat file = imread(filename, 1);
-	if(file.cols*file.cols< 484000)
-		resize(file, src,Size(),8,8, INTER_CUBIC);
+	Mat thr, gray, con;
+	Mat src = imread(filename, 1);
+	//if(file.cols*file.cols< 484000)
+	//	resize(file, src,Size(),8,8, INTER_CUBIC);
 	imshow("file",src);
 	cvtColor(src, gray, CV_BGR2GRAY);
 	threshold(gray, thr, thresh, 255, THRESH_BINARY_INV); //Threshold to find contour
