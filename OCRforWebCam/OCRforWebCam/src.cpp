@@ -105,11 +105,11 @@ void imgproc(const char* filename,int thresh) {
 			imshow("src", src);
 			int c = waitKey(0); // Read corresponding label for contour from keyoard
 			c -= 0x30;     // Convert ascii to intiger value
-			response_array.push_back(c); // Store label to a mat
-			rectangle(src, Point(r.x, r.y), Point(r.x + r.width, r.y + r.height), Scalar(0, 255, 0), 2, 8, 0);
-			drawContours(contour, contours, i, Scalar(255, 0, 0),1,8,hierarchy);
+			if (c >= 0 && c <= 9) {
+				response_array.push_back(c); // Store label to a mat
+				rectangle(src, Point(r.x, r.y), Point(r.x + r.width, r.y + r.height), Scalar(0, 255, 0), 2, 8, 0);
+			}
 	}
-	imshow("contour", contour);
 	// Store the data to file
 	Mat response, tmp;
 	tmp = response_array.reshape(1, 1); //make continuous
