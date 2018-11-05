@@ -172,7 +172,7 @@ int main(int argc, char** argv)
 					sprintf_s(file, "%d-%d.jpg", frame_count, i);
 					string str = file;
 					imwrite(file, retImg);
-					//imgprocess(str);
+					imgprocess(str);
 				}
 			}
 		}
