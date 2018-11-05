@@ -114,11 +114,11 @@ void imgproc(const char* filename,int thresh) {
 	Mat response, tmp;
 	tmp = response_array.reshape(1, 1); //make continuous
 	tmp.convertTo(response, CV_32FC1); // Convert  to float
-	FileStorage Data("TrainingData.yml", FileStorage::APPEND); // Store the sample data in a file
+	FileStorage Data("TrainingData.yml", FileStorage::APPEND); // !!!!!!!!!!!!!!!!!!!!!!!!
 	Data << "data" << sample;
 	Data.release();
 
-	FileStorage Label("LabelData.yml", FileStorage::APPEND); // Store the label data in a file
+	FileStorage Label("LabelData.yml", FileStorage::APPEND); //!!!!!!!!!!!!!!!!!!!!!!!!
 	Label << "label" << response;
 	Label.release();
 	cout << "Training and Label data created successfully....!! " << endl;
