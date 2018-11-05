@@ -34,6 +34,7 @@ int main(int argc, char** argv)
 	while (fscanf(file, "%[^\n]%*c", &name) != EOF) {
 		imgproc(name,the);
 	}
+	remove("filelist.txt");
 	fclose(file);
 	return 0;
 	
@@ -72,9 +73,10 @@ void FileScan(const char * dirwithformat,const char* dir)
 
 void imgproc(const char* filename,int thresh) {
 	//Process image to extract contour
-	Mat thr, gray, con;
-	Mat src = imread(filename, 1);
-	//resize(file, src,Size(),3,3, INTER_CUBIC);
+	Mat thr, gray, con,src;
+	Mat file = imread(filename, 1);
+	if(file.cols*file.cols< 484000)
+		resize(file, src,Size(),3,3, INTER_CUBIC);
 	cvtColor(src, gray, CV_BGR2GRAY);
 	threshold(gray, thr, thresh, 255, THRESH_BINARY_INV); //Threshold to find contour
 	thr.copyTo(con);
