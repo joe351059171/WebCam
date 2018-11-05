@@ -34,8 +34,8 @@ int main(int argc, char** argv)
 	while (fscanf(file, "%[^\n]%*c", &name) != EOF) {
 		imgproc(name,the);
 	}
-	remove("filelist.txt");
 	fclose(file);
+	remove("filelist.txt");
 	return 0;
 	
 }
@@ -76,9 +76,11 @@ void imgproc(const char* filename,int thresh) {
 	Mat thr, gray, con,src;
 	Mat file = imread(filename, 1);
 	if(file.cols*file.cols< 484000)
-		resize(file, src,Size(),3,3, INTER_CUBIC);
+		resize(file, src,Size(),8,8, INTER_CUBIC);
+	imshow("file",src);
 	cvtColor(src, gray, CV_BGR2GRAY);
 	threshold(gray, thr, thresh, 255, THRESH_BINARY_INV); //Threshold to find contour
+	imshow("thr", thr);
 	thr.copyTo(con);
 
 	// Create sample and label data
@@ -86,13 +88,14 @@ void imgproc(const char* filename,int thresh) {
 	vector< Vec4i > hierarchy;
 	Mat sample;
 	Mat response_array;
-	findContours(con, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE); //Find contour
 
+	Mat contour = Mat::zeros(src.size(), CV_8UC1); ;
+
+	findContours(con, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE); //Find contour
+	
 	for (int i = 0; i < contours.size(); i = hierarchy[i][0]) // iterate through first hierarchy level contours
 	{
 			Rect r = boundingRect(contours[i]); //Find bounding rect for each contour
-		//	if (r.area()< 230||r.area()>800)
-		//		continue;
 			rectangle(src, Point(r.x, r.y), Point(r.x + r.width, r.y + r.height), Scalar(0, 0, 255), 2, 8, 0);
 			Mat ROI = thr(r); //Crop the image
 			Mat tmp1, tmp2;
@@ -104,13 +107,13 @@ void imgproc(const char* filename,int thresh) {
 			c -= 0x30;     // Convert ascii to intiger value
 			response_array.push_back(c); // Store label to a mat
 			rectangle(src, Point(r.x, r.y), Point(r.x + r.width, r.y + r.height), Scalar(0, 255, 0), 2, 8, 0);
+			drawContours(contour, contours, i, Scalar(255, 0, 0),1,8,hierarchy);
 	}
-
+	imshow("contour", contour);
 	// Store the data to file
 	Mat response, tmp;
 	tmp = response_array.reshape(1, 1); //make continuous
 	tmp.convertTo(response, CV_32FC1); // Convert  to float
-
 	FileStorage Data("TrainingData.yml", FileStorage::APPEND); // Store the sample data in a file
 	Data << "data" << sample;
 	Data.release();
