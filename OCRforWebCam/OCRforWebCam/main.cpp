@@ -91,7 +91,7 @@ void imgprocess(string filename) {
 												//all output matrices are optional and the predicted value is returned by the method.
 		char name[4];
 		sprintf_s(name, "%d", (int)p);
-		putText(dst, name, Point(r.x, r.y + r.height), 0, 1, Scalar(0, 255, 0), 1, 8);
+		putText(dst, name, Point(r.x, r.y + r.height), 2, 1, Scalar(0, 255, 0), 1, 8);
 		printf("%d", int(p));
 	}
 	printf("\n");
@@ -172,7 +172,7 @@ int main(int argc, char** argv)
 					sprintf_s(file, "%d-%d.jpg", frame_count, i);
 					string str = file;
 					imwrite(file, retImg);
-				//	imgprocess(str);
+					imgprocess(str);
 				}
 			}
 		}
