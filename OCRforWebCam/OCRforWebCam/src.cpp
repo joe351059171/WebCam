@@ -76,7 +76,8 @@ int main(int argc, char** argv)
 	Mat response, tmp;
 	tmp = response_array.reshape(1, 1); //make continuous
 	tmp.convertTo(response, CV_32FC1); // Convert  to float
-	sample = sample.reshape(1, 1);
+	sample.reshape(1, 1);
+	sample.convertTo(sample, CV_32FC1);
 	FileStorage Data("TrainingData.yml", FileStorage::WRITE); // !!!!!!!!!!!!!!!!!!!!!!!!
 	Data << "data" << sample;
 	Data.release();
