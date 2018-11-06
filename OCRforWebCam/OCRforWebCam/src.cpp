@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+//#define _CRT_SECURE_NO_WARNINGS
 
 #include "opencv2/opencv.hpp"
 #include<opencv2/ml/ml.hpp>
@@ -91,7 +91,7 @@ int main(int argc, char** argv)
 	Label.release();
 	cout << "Training and Label data created successfully....!! " << endl;
 	fclose(file);
-	remove("filelist.txt");
+	//remove("filelist.txt");
 	return 0;
 	
 }
