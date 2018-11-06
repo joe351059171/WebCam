@@ -38,8 +38,8 @@ int main(int argc, char** argv)
 		//Process image to extract contour
 		Mat thr, gray, con;
 		Mat src = imread(name, 1);
-		//if(file.cols*file.cols< 484000)
-		//	resize(file, src,Size(),8,8, INTER_CUBIC);
+		if(src.cols*src.cols< 484000)
+			resize(src, src,Size(),8,8, INTER_CUBIC);
 		imshow("file", src);
 		cvtColor(src, gray, CV_BGR2GRAY);
 		threshold(gray, thr, the, 255, THRESH_BINARY_INV); //Threshold to find contour
@@ -91,7 +91,7 @@ int main(int argc, char** argv)
 	Label.release();
 	cout << "Training and Label data created successfully....!! " << endl;
 	fclose(file);
-	//remove("filelist.txt");
+	remove("filelist.txt");
 	return 0;
 	
 }
