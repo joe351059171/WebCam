@@ -68,6 +68,10 @@ int main(int argc, char** argv)
 				response_array.push_back(c); // Store label to a mat
 				rectangle(src, Point(r.x, r.y), Point(r.x + r.width, r.y + r.height), Scalar(0, 255, 0), 2, 8, 0);
 			}
+			else {
+				response_array.push_back(-1); // Store label to a mat
+				rectangle(src, Point(r.x, r.y), Point(r.x + r.width, r.y + r.height), Scalar(0, 0, 255), 2, 8, 0);
+			}
 		}
 		imshow("src", src);
 		waitKey(0);
@@ -76,7 +80,7 @@ int main(int argc, char** argv)
 	Mat response, tmp;
 	tmp = response_array.reshape(1, 1); //make continuous
 	tmp.convertTo(response, CV_32FC1); // Convert  to float
-//	sample = sample.reshape(1, 1);
+	sample = sample.reshape(1, 1);
 	sample.convertTo(sample, CV_32FC1);
 	FileStorage Data("TrainingData.yml", FileStorage::WRITE); // !!!!!!!!!!!!!!!!!!!!!!!!
 	Data << "data" << sample;
