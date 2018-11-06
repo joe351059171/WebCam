@@ -15,10 +15,12 @@ using namespace cv;
 using namespace std;
 
 void FileScan(const char*,const char*);
-void imgproc(const char*,int);
+//void imgproc(const char*,int, Mat, Mat);
 
 int main(int argc, char** argv)
 {
+	Mat sample;
+	Mat response_array;
 	char dir[200] = { 0,0,0,0, };
 	strcat(dir, argv[1]);
 //	printf("%s\n",argv[1]);
@@ -32,8 +34,56 @@ int main(int argc, char** argv)
 	FILE *file = fopen("filelist.txt", "r");
 	char name[200];
 	while (fscanf(file, "%[^\n]%*c", &name) != EOF) {
-		imgproc(name,the);
+		//imgproc(name,the,sample, response_array);
+		//Process image to extract contour
+		Mat thr, gray, con;
+		Mat src = imread(name, 1);
+		//if(file.cols*file.cols< 484000)
+		//	resize(file, src,Size(),8,8, INTER_CUBIC);
+		imshow("file", src);
+		cvtColor(src, gray, CV_BGR2GRAY);
+		threshold(gray, thr, the, 255, THRESH_BINARY_INV); //Threshold to find contour
+		imshow("thr", thr);
+		thr.copyTo(con);
+
+		// Create sample and label data
+		vector< vector <Point> > contours; // Vector for storing contour
+		vector< Vec4i > hierarchy;
+
+		findContours(con, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE); //Find contour
+
+		for (int i = 0; i < contours.size(); i = hierarchy[i][0]) // iterate through first hierarchy level contours
+		{
+			Rect r = boundingRect(contours[i]); //Find bounding rect for each contour
+			rectangle(src, Point(r.x, r.y), Point(r.x + r.width, r.y + r.height), Scalar(0, 0, 255), 2, 8, 0);
+			Mat ROI = thr(r); //Crop the image
+			Mat tmp1, tmp2;
+			resize(ROI, tmp1, Size(10, 10), 0, 0, INTER_LINEAR); //resize to 10X10
+			tmp1.convertTo(tmp2, CV_32FC1); //convert to float
+			sample.push_back(tmp2.reshape(1, 1)); // Store  sample data
+			imshow("src", src);
+			int c = waitKey(0); // Read corresponding label for contour from keyoard
+			c -= 0x30;     // Convert ascii to intiger value
+			if (c >= 0 && c <= 9) {
+				response_array.push_back(c); // Store label to a mat
+				rectangle(src, Point(r.x, r.y), Point(r.x + r.width, r.y + r.height), Scalar(0, 255, 0), 2, 8, 0);
+			}
+		}
+		imshow("src", src);
+		waitKey(0);
+
 	}
+	Mat response, tmp;
+	tmp = response_array.reshape(1, 1); //make continuous
+	tmp.convertTo(response, CV_32FC1); // Convert  to float
+	FileStorage Data("TrainingData.yml", FileStorage::WRITE); // !!!!!!!!!!!!!!!!!!!!!!!!
+	Data << "data" << sample;
+	Data.release();
+
+	FileStorage Label("LabelData.yml", FileStorage::WRITE); //!!!!!!!!!!!!!!!!!!!!!!!!
+	Label << "label" << response;
+	Label.release();
+	cout << "Training and Label data created successfully....!! " << endl;
 	fclose(file);
 	remove("filelist.txt");
 	return 0;
@@ -71,7 +121,7 @@ void FileScan(const char * dirwithformat,const char* dir)
 	_findclose(handle);    // ¹Ø±ÕËÑË÷¾ä±ú
 }
 
-void imgproc(const char* filename,int thresh) {
+/*void imgproc(const char* filename,int thresh) {
 	//Process image to extract contour
 	Mat thr, gray, con;
 	Mat src = imread(filename, 1);
@@ -86,10 +136,6 @@ void imgproc(const char* filename,int thresh) {
 	// Create sample and label data
 	vector< vector <Point> > contours; // Vector for storing contour
 	vector< Vec4i > hierarchy;
-	Mat sample;
-	Mat response_array;
-
-	Mat contour = Mat::zeros(src.size(), CV_8UC1); ;
 
 	findContours(con, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE); //Find contour
 	
@@ -110,19 +156,6 @@ void imgproc(const char* filename,int thresh) {
 				rectangle(src, Point(r.x, r.y), Point(r.x + r.width, r.y + r.height), Scalar(0, 255, 0), 2, 8, 0);
 			}
 	}
-	// Store the data to file
-	Mat response, tmp;
-	tmp = response_array.reshape(1, 1); //make continuous
-	tmp.convertTo(response, CV_32FC1); // Convert  to float
-	FileStorage Data("TrainingData.yml", FileStorage::APPEND); // !!!!!!!!!!!!!!!!!!!!!!!!
-	Data << "data" << sample;
-	Data.release();
-
-	FileStorage Label("LabelData.yml", FileStorage::APPEND); //!!!!!!!!!!!!!!!!!!!!!!!!
-	Label << "label" << response;
-	Label.release();
-	cout << "Training and Label data created successfully....!! " << endl;
-
 	imshow("src", src);
 	waitKey(0);
-}
+}*/
