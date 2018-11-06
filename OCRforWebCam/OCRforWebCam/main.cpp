@@ -97,7 +97,7 @@ void imgprocess(string filename) {
 	printf("\n");
 
 	filename = filename + "x.jpg";
-	imwrite(filename, dst);
+	//imwrite(filename, dst);
 }
 
 // prog.exe rtsp://.... oblique.model [gpuID threshold 10 10 10 10 101 101 101 101]
@@ -172,7 +172,7 @@ int main(int argc, char** argv)
 					sprintf_s(file, "%d-%d.jpg", frame_count, i);
 					string str = file;
 					imwrite(file, retImg);
-					imgprocess(str);
+					//imgprocess(str);
 				}
 			}
 		}
