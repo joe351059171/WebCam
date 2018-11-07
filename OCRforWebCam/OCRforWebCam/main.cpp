@@ -171,8 +171,8 @@ int main(int argc, char** argv)
 					char file[256];
 					sprintf_s(file, "%d-%d.jpg", frame_count, i);
 					string str = file;
-					imwrite(file, retImg);
-					//imgprocess(str);
+					//imwrite(file, retImg);
+					imgprocess(str);
 				}
 			}
 		}
