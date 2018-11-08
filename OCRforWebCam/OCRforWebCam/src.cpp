@@ -39,7 +39,7 @@ int main(int argc, char** argv)
 		Mat thr, gray, con;
 		Mat src = imread(name, 1);
 		if(src.cols*src.cols< 484000)
-			resize(src, src,Size(),8,8, INTER_CUBIC);
+			resize(src, src,Size(),1.5,1.5, INTER_CUBIC);
 		imshow("file", src);
 		cvtColor(src, gray, CV_BGR2GRAY);
 		threshold(gray, thr, the, 255, THRESH_BINARY_INV); //Threshold to find contour
