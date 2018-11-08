@@ -60,7 +60,7 @@ int main(int argc, char** argv)
 			Mat tmp1, tmp2;
 			resize(ROI, tmp1, Size(10, 10), 0, 0, INTER_LINEAR); //resize to 10X10
 			tmp1.convertTo(tmp2, CV_32FC1); //convert to float
-			sample.push_back(tmp2.reshape(1, 1)); // Store  sample data
+			sample.push_back(tmp2.reshape(1, 1)); // Store sample data
 			imshow("src", src);
 			int c = waitKey(0); // Read corresponding label for contour from keyoard
 			c -= 0x30;     // Convert ascii to intiger value
