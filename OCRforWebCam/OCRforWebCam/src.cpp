@@ -56,10 +56,10 @@ int main(int argc, char** argv)
 		{
 			Rect r = boundingRect(contours[i]); //Find bounding rect for each contour
 			rectangle(src, Point(r.x, r.y), Point(r.x + r.width, r.y + r.height), Scalar(0, 0, 255), 2, 8, 0);
-			Mat ROI = thr(r); //Crop the image
+			Mat ROI = gray(r); //Crop the image
 			Mat tmp1, tmp2;
 			resize(ROI, tmp1, Size(10, 10), 0, 0, INTER_LINEAR); //resize to 10X10
-			tmp1.convertTo(tmp2, CV_32FC1); //convert to float
+			tmp1.copyTo(tmp2); //convert to float
 			sample.push_back(tmp2.reshape(1, 1)); // Store sample data
 			imshow("src", src);
 			int c = waitKey(0); // Read corresponding label for contour from keyoard
@@ -69,7 +69,9 @@ int main(int argc, char** argv)
 				rectangle(src, Point(r.x, r.y), Point(r.x + r.width, r.y + r.height), Scalar(0, 255, 0), 2, 8, 0);
 			}
 			else {
-				response_array.push_back(-1); // Store label to a mat
+				//response_array.push_back(-1); // Store label to a mat
+				sample.pop_back(100);
+				printf("illegal\n");
 				rectangle(src, Point(r.x, r.y), Point(r.x + r.width, r.y + r.height), Scalar(255, 0, 0), 2, 8, 0);
 			}
 		}
