@@ -23,9 +23,13 @@ int main(int argc, char** argv)
 	Mat response_array;
 	char dir[200] = { 0,0,0,0, };
 	strcat(dir, argv[1]);
-	printf("%s\n",argv[1]);
+	//printf("%s\n",argv[1]);
 	char dirwithformat[200];
-	int the = atoi(argv[2]);
+	int the = 100;
+	if(argc>2)
+	the	= atoi(argv[2]);
+	if (argc==0)
+		printf("usage:.OCR.exe \"picture path\ends with a \'\\\'\" threshold value(if necessary) \n");
 	//cin.getline(dir, 200);
 	strcpy(dirwithformat, dir);
 	strcat_s(dirwithformat, "*.jpg");
@@ -40,10 +44,10 @@ int main(int argc, char** argv)
 		Mat src = imread(name, 1);
 	//	if(src.cols*src.cols< 484000)
 	//		resize(src, src,Size(),1.5,1.5, INTER_CUBIC);
-		imshow("file", src);
+	//	imshow("file", src);
 		cvtColor(src, gray, CV_BGR2GRAY);
 		threshold(gray, thr, the, 255, THRESH_BINARY_INV); //Threshold to find contour
-		imshow("thr", thr);
+	//	imshow("thr", thr);
 		thr.copyTo(con);
 
 		// Create sample and label data
@@ -70,7 +74,7 @@ int main(int argc, char** argv)
 			}
 			else {
 				//response_array.push_back(-1); // Store label to a mat
-				sample.pop_back(100);
+				sample.pop_back(1);
 				printf("illegal\n");
 				rectangle(src, Point(r.x, r.y), Point(r.x + r.width, r.y + r.height), Scalar(255, 0, 0), 2, 8, 0);
 			}
@@ -81,14 +85,13 @@ int main(int argc, char** argv)
 	}
 	Mat response, tmp;
 	tmp = response_array.reshape(1, 1); //make continuous
-	tmp.convertTo(response, CV_32FC1); // Convert  to float
-	//sample = sample.reshape(1, 1);
-	sample.convertTo(sample, CV_32FC1);
-	FileStorage Data("TrainingData.yml", FileStorage::WRITE); // !!!!!!!!!!!!!!!!!!!!!!!!
+	tmp.copyTo(response);
+	sample.copyTo(sample);
+	FileStorage Data("TrainingData.yml", FileStorage::WRITE);
 	Data << "data" << sample;
 	Data.release();
 
-	FileStorage Label("LabelData.yml", FileStorage::WRITE); //!!!!!!!!!!!!!!!!!!!!!!!!
+	FileStorage Label("LabelData.yml", FileStorage::WRITE);
 	Label << "label" << response;
 	Label.release();
 	cout << "Training and Label data created successfully....!! " << endl;
