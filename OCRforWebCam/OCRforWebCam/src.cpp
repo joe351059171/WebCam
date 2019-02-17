@@ -23,7 +23,7 @@ int main(int argc, char** argv)
 	Mat response_array;
 	char dir[200] = { 0,0,0,0, };
 	strcat(dir, argv[1]);
-//	printf("%s\n",argv[1]);
+	printf("%s\n",argv[1]);
 	char dirwithformat[200];
 	int the = atoi(argv[2]);
 	//cin.getline(dir, 200);
