@@ -7,7 +7,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include <stdio.h>
+#include <iostream>
 #include <io.h>
 #include <string.h>
 
@@ -15,21 +15,88 @@ using namespace cv;
 using namespace std;
 
 void FileScan(const char*,const char*);
+int readFrame(VideoCapture&, Mat&);
 
 int main(int argc, char** argv)
 {
-	if (argc == 1)
-		printf("usage:OCR.exe \"picture path ends with \'\\\'\" threshold value(if necessary) \n");
+	if (argc == 1) {
+		cout<<"usage:OCR.exe videostream [left top width height threshold area_max area_min w/h_max w/h_min ]"<<endl;
+		std::cout << "For example: DriveLabel.exe d:\\sth.mp4" << std::endl;
+	}
+	Mat img, gray, imgThres, labels, seeLabels, stats, centroids;
+	int frame_count = 0, frame_cur = 0, label_num;
+	int threshold = 150;
+	VideoCapture cap;
+	Rect myROI(10, 500, 300, 580);
+	int area_max = 3000, area_min = 1000;
+	double wh_max = 0.6, wh_min = 0.3;
+	if (argc > 6) {
+		myROI.x = atol(argv[2]);
+		myROI.y = atol(argv[3]);
+		myROI.width = atol(argv[4]);
+		myROI.height = atol(argv[5]);
+		threshold = atol(argv[6]);
+		area_max = atol(argv[7]);
+		area_min = atol(argv[8]);
+		wh_max = atol(argv[9]);
+		wh_min = atol(argv[10]);
+	}
+	if (!cap.open(argv[1])) {
+		time_t tm = time(NULL);
+		char tmBuf[50];
+		ctime_s(tmBuf, 50, &tm);
+		return -1;
+	}
+	while (cap.isOpened()) {
+		frame_cur = readFrame(cap, img);
+		if (frame_cur == 0 || img.empty()) {
+			time_t tm = time(NULL);
+			char tmBuf[50];
+			ctime_s(tmBuf, 50, &tm);
+			break;
+		}
+		clock_t dct = clock();
+		img = img(myROI);
+		cvtColor(img, gray, CV_BGR2GRAY);
+		cv::threshold(gray, imgThres, threshold, 255, CV_THRESH_BINARY);
+		label_num = connectedComponentsWithStats(imgThres, labels, stats, centroids);
+
+		for (int i = 0; i < label_num; i++) {
+			int width = stats.at<int>(i, cv::CC_STAT_WIDTH);
+			int height = stats.at<int>(i, cv::CC_STAT_HEIGHT);
+			int area = width * height;//stats.at<int>(i, cv::CC_STAT_AREA);
+			if (area > area_min && area < area_max) {
+				double iou = area / (double)(width*height);
+				double wh = width / (double)(height);
+				if (wh < wh_max&& wh> wh_min) {
+					cv::Rect dect(stats.at<int>(i, cv::CC_STAT_LEFT), stats.at<int>(i, cv::CC_STAT_TOP), width, height);
+					cv::rectangle(img, dect, cv::Scalar(0, 255, 0), 1);
+					cv::Mat retImg = img(dect);
+					char file[256];
+					sprintf_s(file, "%d-%d.jpg", frame_count, i);
+					string str = file;
+					imwrite(file, retImg);
+				}
+			}
+		}
+		dct = clock() - dct;		dct = dct * 1000 / CLOCKS_PER_SEC;
+		frame_count += frame_cur;
+		cv::imshow("Img", img);
+		cv::waitKey(40);
+	}
+	if (cap.isOpened()) {
+		cap.release();
+	}
+
 	Mat sample;
 	Mat response_array;
 	char dir[200] = { 0,0,0,0, };
-	strcat(dir, argv[1]);
-	//printf("%s\n",argv[1]);
+	//strcat(dir, argv[1]);
+	strcat(dir, "./");
 	char dirwithformat[200];
 	int the = 100;
-	if(argc>2)
-	the	= atoi(argv[2]);
-	//cin.getline(dir, 200);
+	//if(argc>2)
+	//the	= atoi(argv[2]);
 	strcpy(dirwithformat, dir);
 	strcat_s(dirwithformat, "*.jpg");
 	FileScan(dirwithformat,dir);
@@ -45,7 +112,7 @@ int main(int argc, char** argv)
 	//		resize(src, src,Size(),1.5,1.5, INTER_CUBIC);
 	//	imshow("file", src);
 		cvtColor(src, gray, CV_BGR2GRAY);
-		threshold(gray, thr, the, 255, THRESH_BINARY_INV); //Threshold to find contour
+		cv::threshold(gray, thr, the, 255, THRESH_BINARY_INV); //Threshold to find contour
 	//	imshow("thr", thr);
 		thr.copyTo(con);
 
@@ -74,13 +141,13 @@ int main(int argc, char** argv)
 			else {
 				//response_array.push_back(-1); // Store label to a mat
 				sample.pop_back(1);
-				printf("illegal\n");
+			//	printf("illegal\n");
 				rectangle(src, Point(r.x, r.y), Point(r.x + r.width, r.y + r.height), Scalar(255, 0, 0), 2, 8, 0);
 			}
 		}
 		imshow("src", src);
 		waitKey(0);
-
+		remove(name);
 	}
 	Mat response, tmp;
 	tmp = response_array.reshape(1, 1); //make continuous
@@ -129,4 +196,17 @@ void FileScan(const char * dirwithformat,const char* dir)
 
 	cout << "Done!\n";
 	_findclose(handle);
+}
+
+int readFrame(VideoCapture &cap, Mat &img) {
+	assert(cap.isOpened());
+	int frames = 0;
+	if (cap.grab()) {
+		frames += 1;
+		if (cap.grab()) {
+			frames += 1;
+			cap.retrieve(img);
+		}
+	}
+	return frames;
 }
