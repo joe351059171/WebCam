@@ -37,75 +37,72 @@ int writeLog(char *fmt, ...)
 int readFrame(cv::VideoCapture &cap, cv::Mat &img) {
 	assert(cap.isOpened());
 	int frames = 0;
-	if (cap.grab()) {
-		frames += 1;
 		if (cap.grab()) {
 			frames += 1;
 			cap.retrieve(img);
 		}
-	}
 	return frames;
 }
 
-void imgprocess(string filename) {
-
-	Mat thr, gray, con;
-	Mat src = imread(filename);
-	cvtColor(src, gray, CV_BGR2GRAY);
-	threshold(gray, thr, 100, 255, THRESH_BINARY_INV); // Threshold to create input
-	thr.copyTo(con);
-
-
-	// Read stored sample and label for training
-	Mat sample;
-	Mat response, tmp;
-	FileStorage Data("TrainingData.yml", FileStorage::READ); // Read traing data to a Mat
-	Data["data"] >> sample;
-	Data.release();
-
-	FileStorage Label("LabelData.yml", FileStorage::READ); // Read label data to a Mat
-	Label["label"] >> response;
-	Label.release();
-
-	Ptr<ml::KNearest>  knn(ml::KNearest::create());
-	//ml::KNearest knn();
-	knn->train(sample, ml::ROW_SAMPLE, response); // Train with sample and responses
-	//cout << "Training compleated.....!!" << endl;
-
-	vector< vector <Point> > contours; // Vector for storing contour
-	vector< Vec4i > hierarchy;
-
-	//Create input sample by contour finding and cropping
-	findContours(con, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
-	Mat dst(src.rows, src.cols, CV_8UC3, Scalar::all(0));
-
-	for (int i = 0; i < contours.size(); i = hierarchy[i][0]) // iterate through each contour for first hierarchy level .
-	{
-		Rect r = boundingRect(contours[i]);
-		Mat ROI = thr(r);
-		Mat tmp1, tmp2;
-		resize(ROI, tmp1, Size(10, 10), 0, 0, INTER_LINEAR);
-		tmp1.convertTo(tmp2, CV_32FC1);
-		Mat response;
-		float p = knn->findNearest(tmp2.reshape(1, 1), 1, response);//If only a single input vector is passed, 
-												//all output matrices are optional and the predicted value is returned by the method.
-		char name[4];
-		sprintf_s(name, "%d", (int)p);
-		putText(dst, name, Point(r.x, r.y + r.height), 2, 1, Scalar(0, 255, 0), 1, 8);
-		printf("%d", int(p));
-	}
-	printf("\n");
-
-	filename = filename + "x.jpg";
-	imwrite(filename, dst);
-}
+//void imgprocess(string filename) {
+//
+//	Mat thr, gray, con;
+//	Mat src = imread(filename);
+//	cvtColor(src, gray, CV_BGR2GRAY);
+//	threshold(gray, thr, 100, 255, THRESH_BINARY_INV); // Threshold to create input
+//	thr.copyTo(con);
+//
+//
+//	// Read stored sample and label for training
+//	Mat sample;
+//	Mat response, tmp;
+//	FileStorage Data("TrainingData.yml", FileStorage::READ); // Read traing data to a Mat
+//	Data["data"] >> sample;
+//	Data.release();
+//
+//	FileStorage Label("LabelData.yml", FileStorage::READ); // Read label data to a Mat
+//	Label["label"] >> response;
+//	Label.release();
+//
+//	Ptr<ml::KNearest>  knn(ml::KNearest::create());
+//	//ml::KNearest knn();
+//	knn->train(sample, ml::ROW_SAMPLE, response); // Train with sample and responses
+//	//cout << "Training compleated.....!!" << endl;
+//
+//	vector< vector <Point> > contours; // Vector for storing contour
+//	vector< Vec4i > hierarchy;
+//
+//	//Create input sample by contour finding and cropping
+//	findContours(con, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
+//	Mat dst(src.rows, src.cols, CV_8UC3, Scalar::all(0));
+//
+//	for (int i = 0; i < contours.size(); i = hierarchy[i][0]) // iterate through each contour for first hierarchy level .
+//	{
+//		Rect r = boundingRect(contours[i]);
+//		Mat ROI = thr(r);
+//		Mat tmp1, tmp2;
+//		resize(ROI, tmp1, Size(10, 10), 0, 0, INTER_LINEAR);
+//		tmp1.convertTo(tmp2, CV_32FC1);
+//		Mat response;
+//		float p = knn->findNearest(tmp2.reshape(1, 1), 1, response);//If only a single input vector is passed, 
+//												//all output matrices are optional and the predicted value is returned by the method.
+//		char name[4];
+//		sprintf_s(name, "%d", (int)p);
+//		putText(dst, name, Point(r.x, r.y + r.height), 2, 1, Scalar(0, 255, 0), 1, 8);
+//		printf("%d", int(p));
+//	}
+//	printf("\n");
+//
+//	filename = filename + "x.jpg";
+//	imwrite(filename, dst);
+//}
 
 // prog.exe rtsp://.... oblique.model [gpuID threshold 10 10 10 10 101 101 101 101]
 int main(int argc, char** argv)
 {
 	if (argc == 1) {
-		std::cout << "DriveLabel.exe videostream [left top width height threshold area_max area_min w/h_max w/h_min ]" << std::endl;
-		std::cout << "For example: DriveLabel.exe d:\\sth.mp4" << std::endl;
+		std::cout << "DriveLabel.exe videostream [ROI.x ROI.y width height threshold area_max area_min w/h_max w/h_min ]" << std::endl;
+		std::cout << "For example: DriveLabel.exe d:\\sth.mp4 10 500 300 580 150 3000 1000 0.6 0.3" << std::endl;
 	}
 	cv::Mat img, gray, imgThres, labels, seeLabels, stats, centroids;
 	int frame_count = 0, frame_cur = 0, label_num;
@@ -123,18 +120,23 @@ int main(int argc, char** argv)
 		threshold = atol(argv[6]);
 		area_max = atol(argv[7]);
 		area_min = atol(argv[8]);
-		wh_max = atol(argv[9]);
-		wh_min = atol(argv[10]);
+		wh_max = atof(argv[9]);
+		wh_min = atof(argv[10]);
 	}
-	//cvw.open("test.mp4", CV_FOURCC('M', 'J', 'P', 'G'), 25, cv::Size(300, 580));
-	if (!cap.open(argv[1])) {
-		//cout << "video stream failed! please check it!" << endl;
-		time_t tm = time(NULL);
-		char tmBuf[50];
-		ctime_s(tmBuf, 50, &tm);
-		//writeLog("%s \n %s video stream failed! please check it!", argv[1], tmBuf);
-		return -1;
-	}
+	cap.open(argv[1]);
+
+	Size sWH = Size((int)cap.get(CV_CAP_PROP_FRAME_WIDTH), (int)cap.get(CV_CAP_PROP_FRAME_HEIGHT));
+	cvw.open("result.avi", CV_FOURCC('M', 'P', '4', '2'), 25, Size(myROI.width,myROI.height), true);
+
+	//if (!cap.open(argv[1])) {
+	//	//cout << "video stream failed! please check it!" << endl;
+	//	time_t tm = time(NULL);
+	//	char tmBuf[50];
+	//	ctime_s(tmBuf, 50, &tm);
+	//	//writeLog("%s \n %s video stream failed! please check it!", argv[1], tmBuf);
+	//	return -1;
+	//}
+
 	while (cap.isOpened()) {
 		frame_cur = readFrame(cap, img);
 		if (frame_cur == 0 || img.empty()) {
@@ -166,13 +168,13 @@ int main(int argc, char** argv)
 				if (wh < wh_max&& wh> wh_min) {
 					//	cout << "(" << stats.at<int>(i, cv::CC_STAT_LEFT) << " x " << stats.at<int>(i, cv::CC_STAT_TOP) << ")(" << width << " x " << height << ")" << endl;
 					cv::Rect dect(stats.at<int>(i, cv::CC_STAT_LEFT), stats.at<int>(i, cv::CC_STAT_TOP), width, height);
-					cv::rectangle(img, dect, cv::Scalar(0, 255, 0), 1);
-					cv::Mat retImg = img(dect);
-					char file[256];
-					sprintf_s(file, "%d-%d.jpg", frame_count, i);
-					string str = file;
-					imwrite(file, retImg);
-					imgprocess(str);
+					cv::rectangle(img, dect, cv::Scalar(0, 0, 255), 2);
+					//cv::Mat retImg = img(dect);
+					//char file[256];
+					//sprintf_s(file, "%d-%d.jpg", frame_count, i);
+					//string str = file;
+					//imwrite(file, retImg);
+					//imgprocess(str);
 				}
 			}
 		}
@@ -181,11 +183,12 @@ int main(int argc, char** argv)
 		//cout << "Time: " << dct << "Frame: " << frame_count << " " << "score " << label_num << endl;
 		frame_count += frame_cur;
 		cvw << img;
-		cv::imshow("Img", img);
+		imshow("Img", img);
+		//cv::imshow("Img", img);
 
 		//if (cv::waitKey(40) >= 0)
 			//break;
-		cv::waitKey(40);
+		cv::waitKey(10);
 	}
 	if (cap.isOpened()) {
 		cap.release();
