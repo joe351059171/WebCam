@@ -109,6 +109,7 @@ int main(int argc, char** argv)
 	int threshold = 150;
 	cv::VideoCapture cap;
 	cv::VideoWriter cvw;
+	cv:VideoWriter thre;
 	cv::Rect myROI(10, 500, 300, 580);
 	int area_max = 3000, area_min = 1000;
 	double wh_max = 0.6, wh_min = 0.3;
@@ -127,6 +128,7 @@ int main(int argc, char** argv)
 
 	Size sWH = Size((int)cap.get(CV_CAP_PROP_FRAME_WIDTH), (int)cap.get(CV_CAP_PROP_FRAME_HEIGHT));
 	cvw.open("result.avi", CV_FOURCC('M', 'P', '4', '2'), 25, Size(myROI.width,myROI.height), true);
+	thre.open("thresh.avi", CV_FOURCC('M', 'P', '4', '2'), 25, Size(myROI.width, myROI.height), true);
 
 	//if (!cap.open(argv[1])) {
 	//	//cout << "video stream failed! please check it!" << endl;
@@ -147,10 +149,15 @@ int main(int argc, char** argv)
 			break;
 		}
 		clock_t dct = clock();
+		Mat copy = img;
 		img = img(myROI);
 		cv::cvtColor(img, gray, CV_BGR2GRAY);
-		//gray = gray(myROI);
-		cv::threshold(gray, imgThres, threshold, 255, CV_THRESH_BINARY);
+		cv::cvtColor(copy, copy, CV_BGR2GRAY);
+		threshold = cv::threshold(copy, imgThres,7 ,255, CV_THRESH_OTSU);
+		//printf("%d\n", threshold);
+		//cv::threshold(gray, imgThres, threshold, 255, CV_THRESH_BINARY);
+		imgThres = imgThres(myROI);
+		imshow("thresh", imgThres);
 		//cv::adaptiveThreshold(gray, imgThres, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, 125, 5);
 		//label_num = cv::connectedComponents(imgThres, labels);
 		label_num = cv::connectedComponentsWithStats(imgThres, labels, stats, centroids);
@@ -183,8 +190,9 @@ int main(int argc, char** argv)
 		//cout << "Time: " << dct << "Frame: " << frame_count << " " << "score " << label_num << endl;
 		frame_count += frame_cur;
 		cvw << img;
-		imshow("Img", img);
-		//cv::imshow("Img", img);
+		cvtColor(imgThres, imgThres, COLOR_GRAY2BGR);
+		thre << imgThres;
+		cv::imshow("Img", img);
 
 		//if (cv::waitKey(40) >= 0)
 			//break;
@@ -194,5 +202,6 @@ int main(int argc, char** argv)
 		cap.release();
 	}
 	cvw.release();
+	thre.release();
 	return 0;
 }
